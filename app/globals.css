@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+@theme {
+  --color-surface: #f7f9fb;
+  --color-surface-dim: #d8dadc;
+  --color-surface-bright: #f7f9fb;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f4f6;
+  --color-surface-container: #eceef0;
+  --color-surface-container-high: #e6e8ea;
+  --color-surface-container-highest: #e0e3e5;
+  --color-on-surface: #191c1e;
+  --color-on-surface-variant: #45474c;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-outline: #75777d;
+  --color-outline-variant: #c5c6cd;
+  --color-primary: #091426;
+  --color-on-primary: #ffffff;
+  --color-primary-container: #1e293b;
+  --color-on-primary-container: #8590a6;
+  --color-inverse-primary: #bcc7de;
+  --color-secondary: #585f67;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #dce3ec;
+  --color-on-secondary-container: #5e656d;
+  --color-tertiary: #001906;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #003010;
+  --color-on-tertiary-container: #00a64a;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-on-error-container: #93000a;
+  --color-background: #f7f9fb;
+  --color-on-background: #191c1e;
+
+  --font-arabic: "IBM Plex Sans Arabic", sans-serif;
+
+  --radius-sm: 0.25rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+* {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+}
+
+body {
+  background-color: #f7f9fb;
+  color: #191c1e;
+  direction: rtl;
+}
