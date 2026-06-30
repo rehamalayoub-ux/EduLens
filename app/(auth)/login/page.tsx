@@ -13,61 +13,6 @@ const ERROR_MESSAGES: Record<string, string> = {
   unknown: "حدث خطأ، حاول مجدداً",
 };
 
-const DEMO_TEACHERS = [
-  {
-    name: "أ. سارة المطيري",
-    subject: "رياضيات • المرحلة المتوسطة",
-    avatar: "سم",
-    color: "bg-[#7c3aed]",
-    rating: 4.9,
-    reviews: 38,
-    quote: "تشرح بأسلوب واضح جداً، الطلاب أحبّوا حصصها كثيراً هذا الفصل.",
-    reviewer: "المشرفة التربوية",
-    stars: 5,
-  },
-  {
-    name: "أ. خالد العنزي",
-    subject: "علوم • المرحلة الابتدائية",
-    avatar: "عخ",
-    color: "bg-[#0891b2]",
-    rating: 4.7,
-    reviews: 52,
-    quote: "يستخدم التجارب العملية بشكل رائع، الطلاب يتفاعلون معه بحماس.",
-    reviewer: "مدير المدرسة",
-    stars: 5,
-  },
-  {
-    name: "أ. نورة السعدون",
-    subject: "لغة عربية • المرحلة الثانوية",
-    avatar: "نس",
-    color: "bg-[#be185d]",
-    rating: 4.8,
-    reviews: 29,
-    quote: "أسلوبها في تدريس القواعد يجعل الطلاب يفهمون بسرعة ودون ملل.",
-    reviewer: "ولي أمر",
-    stars: 5,
-  },
-];
-
-function StarRating({ count }: { count: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <svg
-          key={i}
-          width="12"
-          height="12"
-          viewBox="0 0 24 24"
-          fill={i < count ? "#f59e0b" : "none"}
-          stroke="#f59e0b"
-          strokeWidth="2"
-        >
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-        </svg>
-      ))}
-    </div>
-  );
-}
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -86,63 +31,7 @@ function LoginForm() {
         <p className="text-[#45474c] text-sm font-medium">تقييم المعلمين بذكاء ووضوح</p>
       </div>
 
-      {/* Demo CTA banner */}
-      <div className="w-full max-w-xl mb-5 bg-gradient-to-l from-[#1e3a5f] to-[#091426] rounded-3xl px-6 py-5 shadow-md flex flex-col sm:flex-row items-center gap-4">
-        <div className="flex-1 text-right">
-          <p className="text-white font-bold text-base mb-0.5">جرّب EduLens الآن — مجاناً وبدون حساب</p>
-          <p className="text-[#93c5fd] text-xs">استعرض لوحات التقييم والتقارير مباشرة</p>
-        </div>
-        <form method="POST" action="/api/demo-login" className="shrink-0">
-          <button
-            type="submit"
-            className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#0c1a2e] font-bold px-6 py-2.5 rounded-xl text-sm transition whitespace-nowrap flex items-center gap-2"
-          >
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-            دخول تجريبي فوري
-          </button>
-        </form>
-      </div>
-
-      {/* Teacher testimonials */}
-      <div className="w-full max-w-xl mb-5 grid grid-cols-1 sm:grid-cols-3 gap-3">
-        {DEMO_TEACHERS.map((t) => (
-          <div key={t.name} className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-4 flex flex-col gap-2">
-            {/* Avatar + name */}
-            <div className="flex items-center gap-2">
-              <div className={`${t.color} w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0`}>
-                {t.avatar}
-              </div>
-              <div className="min-w-0">
-                <p className="text-[#091426] text-xs font-bold truncate">{t.name}</p>
-                <p className="text-[#75777d] text-[10px] truncate">{t.subject}</p>
-              </div>
-            </div>
-            {/* Rating bar */}
-            <div className="flex items-center gap-1.5">
-              <span className="text-[#091426] text-xs font-bold">{t.rating}</span>
-              <div className="flex-1 bg-[#f2f4f6] rounded-full h-1.5">
-                <div
-                  className="bg-[#f59e0b] h-1.5 rounded-full"
-                  style={{ width: `${(t.rating / 5) * 100}%` }}
-                />
-              </div>
-              <span className="text-[#75777d] text-[10px]">{t.reviews} تقييم</span>
-            </div>
-            {/* Quote */}
-            <blockquote className="text-[#45474c] text-[11px] leading-relaxed border-r-2 border-[#e0e3e5] pr-2">
-              "{t.quote}"
-            </blockquote>
-            <div className="flex items-center justify-between mt-auto">
-              <StarRating count={t.stars} />
-              <span className="text-[#75777d] text-[10px]">{t.reviewer}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="w-full max-w-xl space-y-3">
+      <div className="w-full max-w-sm space-y-3">
         {/* Login form */}
         <div className="bg-white rounded-3xl shadow-sm border border-[#e0e3e5] px-6 py-7">
           <h2 className="text-base font-bold text-[#091426] text-right mb-5">تسجيل الدخول</h2>
@@ -221,6 +110,23 @@ function LoginForm() {
             </Link>
           </div>
         </div>
+
+        {/* Demo login */}
+        <div className="flex items-center gap-3 px-2">
+          <div className="flex-1 h-px bg-[#e0e3e5]" />
+          <span className="text-xs text-[#75777d]">أو</span>
+          <div className="flex-1 h-px bg-[#e0e3e5]" />
+        </div>
+        <form method="POST" action="/api/demo-login">
+          <button type="submit"
+            className="w-full bg-[#f0fdf4] hover:bg-[#dcfce7] border border-[#bbf7d0] text-[#166534] font-semibold py-3.5 rounded-2xl transition text-sm flex items-center justify-center gap-2 shadow-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            دخول تجريبي فوري بدون حساب
+          </button>
+        </form>
       </div>
 
       <p className="mt-8 text-xs text-[#75777d]">2025 EduLens. جميع الحقوق محفوظة.</p>
