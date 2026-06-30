@@ -20,11 +20,37 @@ export default function RegisterPage() {
     setError(null);
 
     const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { full_name: fullName } } });
-    if (error) { setError("حدث خطأ أثناء إنشاء الحساب"); setLoading(false); return; }
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("already registered") || msg.includes("already exists")) {
+        setError("هذا البريد الإلكتروني مسجّل بالفعل — سجّل الدخول");
+      } else if (msg.includes("password")) {
+        setError("كلمة المرور ضعيفة — استخدم 8 أحرف أو أكثر");
+      } else {
+        setError("حدث خطأ أثناء إنشاء الحساب، حاول مجدداً");
+      }
+      setLoading(false);
+      return;
+    }
+
+    // If user session is returned directly (email confirmation disabled), go to dashboard
+    if (data.session) {
+      await fetch("/api/create-profile", { method: "POST" });
+      router.refresh();
+      router.push("/dashboard");
+      return;
+    }
 
     if (data.user) {
-      // Role assignment happens server-side to prevent client tampering
       await fetch("/api/create-profile", { method: "POST" });
     }
     setSuccess(true);
@@ -37,9 +63,9 @@ export default function RegisterPage() {
         <div className="bg-white rounded-3xl shadow-sm px-8 py-10 w-full max-w-sm text-center">
           <div className="text-5xl mb-4">✅</div>
           <h2 className="text-lg font-bold text-[#091426] mb-2">تم إنشاء الحساب بنجاح!</h2>
-          <p className="text-sm text-[#45474c] mb-6">تحقق من بريدك الإلكتروني لتأكيد الحساب.</p>
+          <p className="text-sm text-[#45474c] mb-6">يمكنك الآن تسجيل الدخول بالبريد الإلكتروني وكلمة المرور.</p>
           <Link href="/login" className="block w-full bg-[#091426] text-white font-semibold py-3 rounded-xl text-sm text-center">
-            تسجيل الدخول
+            تسجيل الدخول الآن
           </Link>
         </div>
       </div>

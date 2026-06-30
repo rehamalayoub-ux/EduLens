@@ -21,10 +21,20 @@ export default function LoginPage() {
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
-      setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      const msg = authError.message.toLowerCase();
+      if (msg.includes("email not confirmed")) {
+        setError("البريد الإلكتروني غير مؤكد — تحقق من بريدك أو أنشئ حساباً جديداً");
+      } else if (msg.includes("invalid login") || msg.includes("invalid credentials")) {
+        setError("البريد الإلكتروني أو كلمة المرور غير صحيحة");
+      } else if (msg.includes("too many requests")) {
+        setError("محاولات كثيرة — انتظر دقيقة ثم حاول مجدداً");
+      } else {
+        setError("حدث خطأ أثناء تسجيل الدخول، حاول مجدداً");
+      }
       setLoading(false);
       return;
     }
+    router.refresh();
     router.push("/dashboard");
   }
 
