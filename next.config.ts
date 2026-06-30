@@ -22,14 +22,12 @@ const securityHeaders = [
     key: "Content-Security-Policy",
     value: [
       "default-src 'self'",
-      // Next.js inline scripts use nonces; allow 'unsafe-inline' only in dev
-      process.env.NODE_ENV === "production"
-        ? "script-src 'self'"
-        : "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+      // Next.js App Router requires 'unsafe-inline' for hydration scripts
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
-      // Supabase API + OpenRouter
-      `connect-src 'self' ${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""} https://openrouter.ai`,
+      // Supabase (HTTP + WebSocket for realtime) + OpenRouter
+      `connect-src 'self' https://kvqbxlzsksqblnpnbwkh.supabase.co wss://kvqbxlzsksqblnpnbwkh.supabase.co https://openrouter.ai`,
       "img-src 'self' data: blob:",
       "frame-ancestors 'none'",
       "base-uri 'self'",
