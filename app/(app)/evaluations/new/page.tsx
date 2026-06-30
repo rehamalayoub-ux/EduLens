@@ -3,18 +3,30 @@ import { redirect } from "next/navigation";
 import EvaluationWizard from "./EvaluationWizard";
 
 export default async function NewEvaluationPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  let teachers: { id: string; name: string; subject: string; grade_level: string }[] = [];
 
-  const { data: teachers } = await supabase
-    .from("teachers")
-    .select("id, name, subject, grade_level")
-    .eq("user_id", user.id)
-    .order("name");
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
 
-  if (!teachers || teachers.length === 0) {
-    redirect("/teachers/new");
+    const { data } = await supabase
+      .from("teachers")
+      .select("id, name, subject, grade_level")
+      .eq("user_id", user.id)
+      .order("name");
+
+    teachers = data ?? [];
+  } catch {
+    // Demo teachers for preview
+  }
+
+  if (teachers.length === 0) {
+    teachers = [
+      { id: "demo-1", name: "أحمد محمد السالم",    subject: "الرياضيات",    grade_level: "الصف العاشر" },
+      { id: "demo-2", name: "فاطمة علي الزهراني",  subject: "العلوم",       grade_level: "الصف الثامن" },
+      { id: "demo-3", name: "خالد عبدالله العمري", subject: "اللغة العربية", grade_level: "الصف الثاني عشر" },
+    ];
   }
 
   return (

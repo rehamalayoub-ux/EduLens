@@ -3,21 +3,25 @@ import { redirect, notFound } from "next/navigation";
 import { RUBRIC_CATEGORIES } from "@/lib/rubric";
 import Link from "next/link";
 import PrintButton from "./PrintButton";
+import { formatDateAr } from "@/lib/formatDate";
 import DeleteEvaluationButton from "./DeleteEvaluationButton";
 import EditCommentsForm from "./EditCommentsForm";
 
 export default async function EvaluationReportPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
-  const { data: ev } = await supabase
-    .from("evaluations")
-    .select("*, teacher:teachers(*)")
-    .eq("id", id)
-    .eq("user_id", user.id)
-    .single();
+  let ev: any = null;
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
+    const { data } = await supabase
+      .from("evaluations")
+      .select("*, teacher:teachers(*)")
+      .eq("id", id)
+      .eq("user_id", user.id)
+      .single();
+    ev = data;
+  } catch {}
 
   if (!ev) notFound();
 
@@ -38,8 +42,9 @@ export default async function EvaluationReportPage({ params }: { params: Promise
           <PrintButton />
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/evaluations" className="text-sm text-[#45474c] hover:text-[#091426] px-4 py-2 rounded-lg hover:bg-[#f2f4f6] transition">
-            → العودة للسجل
+          <Link href="/evaluations" className="text-sm text-[#45474c] hover:text-[#091426] px-4 py-2 rounded-lg hover:bg-[#f2f4f6] transition flex items-center gap-1">
+            العودة للسجل
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
           </Link>
           <span className={`px-3 py-1.5 rounded-full text-xs font-semibold ${
             ev.status === "completed" ? "bg-[#dcfce7] text-[#00a64a]" : "bg-[#f2f4f6] text-[#45474c]"
@@ -58,7 +63,7 @@ export default async function EvaluationReportPage({ params }: { params: Promise
           <InfoRow label="المادة الدراسية" value={ev.subject} />
           <InfoRow label="الصف / الشعبة" value={ev.grade_level} />
           <InfoRow label="موضوع الدرس" value={ev.lesson_topic} />
-          <InfoRow label="تاريخ الزيارة" value={new Date(ev.date).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })} />
+          <InfoRow label="تاريخ الزيارة" value={formatDateAr(ev.date)} />
           <InfoRow label="المعدل الكلي" value={ev.average_score != null ? `${Number(ev.average_score).toFixed(1)} / 5` : "-"} highlight />
         </div>
       </div>

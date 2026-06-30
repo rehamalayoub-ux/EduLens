@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 200" width="520" height="200">
+  <!-- Open Book -->
+  <g transform="translate(20, 20)">
+    <!-- Left page -->
+    <path d="M30 140 Q60 110 90 130 L90 60 Q60 40 30 70 Z" fill="#c8d8f0" stroke="#1a2e5a" stroke-width="2"/>
+    <!-- Right page -->
+    <path d="M90 130 Q120 110 150 140 L150 70 Q120 40 90 60 Z" fill="#d8e4f5" stroke="#1a2e5a" stroke-width="2"/>
+    <!-- Book spine -->
+    <line x1="90" y1="60" x2="90" y2="130" stroke="#1a2e5a" stroke-width="2.5"/>
+    <!-- Book bottom -->
+    <path d="M30 140 Q90 155 150 140" stroke="#1a2e5a" stroke-width="2" fill="none"/>
+
+    <!-- Checklist page (white rectangle, slight angle) -->
+    <rect x="52" y="10" width="76" height="96" rx="6" fill="white" stroke="#c0cce0" stroke-width="1.5" transform="rotate(-3 90 58)"/>
+    <!-- Gray lines on page -->
+    <line x1="68" y1="38" x2="116" y2="36" stroke="#c8d0dc" stroke-width="3" stroke-linecap="round" transform="rotate(-3 90 58)"/>
+    <line x1="68" y1="52" x2="116" y2="50" stroke="#c8d0dc" stroke-width="3" stroke-linecap="round" transform="rotate(-3 90 58)"/>
+    <line x1="68" y1="66" x2="116" y2="64" stroke="#c8d0dc" stroke-width="3" stroke-linecap="round" transform="rotate(-3 90 58)"/>
+    <!-- Green checkmarks -->
+    <polyline points="58,38 62,43 72,33" stroke="#00a64a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="rotate(-3 90 58)"/>
+    <polyline points="58,52 62,57 72,47" stroke="#00a64a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="rotate(-3 90 58)"/>
+    <polyline points="58,66 62,71 72,61" stroke="#00a64a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="rotate(-3 90 58)"/>
+
+    <!-- Eye/Lens circle (outer blue) -->
+    <circle cx="90" cy="115" r="34" fill="none" stroke="#2563eb" stroke-width="4"/>
+    <!-- Eye/Lens circle (inner dark) -->
+    <circle cx="90" cy="115" r="22" fill="#1a2e5a"/>
+    <!-- Pupil white -->
+    <circle cx="90" cy="115" r="10" fill="white"/>
+    <!-- Iris dark -->
+    <circle cx="90" cy="115" r="8" fill="#1a2e5a"/>
+    <!-- Green arc highlight (top-right) -->
+    <path d="M 96 107 A 10 10 0 0 1 100 113" stroke="#00a64a" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <!-- Light reflection -->
+    <circle cx="94" cy="110" r="3" fill="white" opacity="0.8"/>
+  </g>
+
+  <!-- Text: EduLens -->
+  <text x="210" y="82" font-family="'Segoe UI', Arial, sans-serif" font-size="58" font-weight="800" letter-spacing="-1">
+    <tspan fill="#1a2e5a">Edu</tspan><tspan fill="#2563eb">Lens</tspan>
+  </text>
+
+  <!-- Divider line with dots -->
+  <line x1="210" y1="98" x2="490" y2="98" stroke="#b0bcc8" stroke-width="1.5"/>
+  <circle cx="205" cy="98" r="3" fill="#b0bcc8"/>
+  <circle cx="495" cy="98" r="3" fill="#b0bcc8"/>
+
+  <!-- Arabic brand name -->
+  <text x="350" y="132" font-family="'IBM Plex Sans Arabic', 'Segoe UI', Arial, sans-serif" font-size="26" font-weight="700" fill="#1a2e5a" text-anchor="middle" dominant-baseline="middle">إديو لنـس</text>
+
+  <!-- Tagline -->
+  <text x="350" y="162" font-family="'IBM Plex Sans Arabic', 'Segoe UI', Arial, sans-serif" font-size="16" fill="#45474c" text-anchor="middle" dominant-baseline="middle">رؤية واضحة لتعليم أفضل</text>
+</svg>

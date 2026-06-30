@@ -1,0 +1,44 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#6e1f40"/>
+  <!-- Dress/body -->
+  <path d="M 15 200 C 15 158 50 148 100 152 C 150 148 185 158 185 200Z" fill="#4a1028"/>
+  <!-- Hijab outer -->
+  <path d="M 53 110 C 50 82 57 58 100 56 C 143 58 150 82 147 110 C 150 138 144 160 100 164 C 56 160 50 138 53 110Z" fill="#12243a"/>
+  <!-- Hijab bottom shadow -->
+  <path d="M 55 122 C 52 142 56 160 100 164 C 144 160 148 142 145 122 C 140 136 122 148 100 150 C 78 148 60 136 55 122Z" fill="#0a1828"/>
+  <!-- Hijab highlight -->
+  <path d="M 68 66 C 78 58 100 56 100 56 C 100 56 122 58 132 66 C 120 62 100 61 80 66Z" fill="#1e3a5a" opacity="0.6"/>
+  <!-- Face -->
+  <ellipse cx="100" cy="103" rx="32" ry="37" fill="#f0c895"/>
+  <!-- Left eye white -->
+  <ellipse cx="86" cy="99" rx="7.5" ry="6" fill="white"/>
+  <!-- Left iris (green/hazel) -->
+  <circle cx="86" cy="100" r="4.2" fill="#2d4a1a"/>
+  <circle cx="86" cy="100" r="2.3" fill="#0a1005"/>
+  <circle cx="87.5" cy="98.5" r="1" fill="white"/>
+  <!-- Right eye white -->
+  <ellipse cx="114" cy="99" rx="7.5" ry="6" fill="white"/>
+  <!-- Right iris -->
+  <circle cx="114" cy="100" r="4.2" fill="#2d4a1a"/>
+  <circle cx="114" cy="100" r="2.3" fill="#0a1005"/>
+  <circle cx="115.5" cy="98.5" r="1" fill="white"/>
+  <!-- Eyelashes -->
+  <path d="M 78 97 Q 86 92 94 96" stroke="#0a0a0a" stroke-width="2" fill="none"/>
+  <path d="M 106 96 Q 114 92 122 97" stroke="#0a0a0a" stroke-width="2" fill="none"/>
+  <!-- Eyebrows (thin, arched) -->
+  <path d="M 78 88 Q 86 84 95 87" stroke="#3a2010" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M 105 87 Q 114 84 122 88" stroke="#3a2010" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- Nose (delicate) -->
+  <path d="M 100 107 L 97 115" stroke="#d4a870" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M 100 107 L 103 115" stroke="#d4a870" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="M 94 117 Q 100 120 106 117" stroke="#d4a870" stroke-width="1.4" fill="none"/>
+  <!-- Mouth (lipstick) -->
+  <path d="M 88 128 Q 100 137 112 128" stroke="#a03050" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+  <path d="M 89 128 Q 100 133 111 128 Q 100 130 89 128Z" fill="#c84060" opacity="0.7"/>
+  <!-- Top lip cupid's bow -->
+  <path d="M 89 128 Q 94 125 100 128 Q 106 125 111 128" stroke="#c84060" stroke-width="1.2" fill="none" opacity="0.8"/>
+  <!-- Cheek blush -->
+  <ellipse cx="74" cy="113" rx="9" ry="5.5" fill="#e87080" opacity="0.18"/>
+  <ellipse cx="126" cy="113" rx="9" ry="5.5" fill="#e87080" opacity="0.18"/>
+</svg>

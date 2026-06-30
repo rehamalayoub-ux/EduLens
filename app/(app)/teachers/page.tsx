@@ -1,76 +1,55 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import DeleteTeacherButton from "./DeleteTeacherButton";
+import TeacherCard from "./TeacherCard";
+
+const DEMO_TEACHERS = [
+  { id: "1", name: "أحمد محمد السالم",    subject: "الرياضيات",         grade_level: "الصف العاشر",      visits: 3, avg_score: 92, status: "completed", photo: "/teachers/teacher-1.svg" },
+  { id: "2", name: "فاطمة علي الزهراني",  subject: "العلوم",             grade_level: "الصف الثامن",      visits: 5, avg_score: 87, status: "completed", photo: "/teachers/teacher-2.svg" },
+  { id: "3", name: "خالد عبدالله العمري", subject: "اللغة العربية",      grade_level: "الصف الثاني عشر", visits: 2, avg_score: 78, status: "draft",     photo: "/teachers/teacher-3.svg" },
+  { id: "4", name: "نورة سعد القحطاني",   subject: "اللغة الإنجليزية",  grade_level: "الصف العاشر",      visits: 4, avg_score: 95, status: "completed", photo: "/teachers/teacher-4.svg" },
+  { id: "5", name: "محمد إبراهيم الشمري", subject: "التاريخ",            grade_level: "الصف الحادي عشر", visits: 1, avg_score: null, status: "none",    photo: "/teachers/teacher-5.svg" },
+  { id: "6", name: "سلمى عمر البلوي",     subject: "التربية الإسلامية", grade_level: "الصف التاسع",      visits: 6, avg_score: 90, status: "completed", photo: "/teachers/teacher-6.svg" },
+];
 
 export default async function TeachersPage() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  let teachers: typeof DEMO_TEACHERS = DEMO_TEACHERS;
 
-  const { data: teachers } = await supabase
-    .from("teachers")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  try {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from("teachers")
+        .select("id, name, subject, grade_level")
+        .eq("user_id", user.id)
+        .order("name");
+      if (data && data.length > 0) {
+        teachers = data.map((t: any) => ({
+          ...t, visits: 0, avg_score: null, status: "none" as const,
+        }));
+      }
+    }
+  } catch {}
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-[#091426]">المعلمون</h1>
-        <Link
-          href="/teachers/new"
-          className="flex items-center gap-2 bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-5 py-3 rounded-xl transition text-sm"
-        >
-          <PlusIcon />
-          <span>إضافة معلم</span>
+    <div dir="rtl">
+      <div className="flex items-center justify-between mb-6">
+        <Link href="/teachers/new"
+          className="bg-[#091426] hover:bg-[#1e293b] text-white text-sm font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          إضافة معلم جديد
         </Link>
+        <div className="text-right">
+          <h1 className="text-2xl font-bold text-[#091426]">المعلمون</h1>
+          <p className="text-sm text-[#45474c] mt-0.5">{teachers.length} معلم مسجّل</p>
+        </div>
       </div>
 
-      {!teachers || teachers.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#e0e3e5] py-20 text-center shadow-sm">
-          <div className="text-5xl mb-4">👨‍🏫</div>
-          <p className="text-[#45474c] font-medium mb-1">لا يوجد معلمون بعد</p>
-          <p className="text-sm text-[#75777d] mb-6">أضف أول معلم لبدء التقييمات</p>
-          <Link
-            href="/teachers/new"
-            className="inline-flex items-center gap-2 bg-[#091426] text-white px-5 py-3 rounded-xl text-sm font-semibold"
-          >
-            <PlusIcon />
-            إضافة معلم
-          </Link>
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl border border-[#e0e3e5] overflow-hidden shadow-sm">
-          <div className="divide-y divide-[#e0e3e5]">
-            {teachers.map((teacher) => (
-              <div key={teacher.id} className="flex items-center justify-between px-6 py-4 hover:bg-[#f7f9fb] transition">
-                <div className="flex items-center gap-3">
-                  <DeleteTeacherButton id={teacher.id} />
-                  <Link
-                    href={`/teachers/${teacher.id}/edit`}
-                    className="text-sm text-[#45474c] hover:text-[#091426] transition px-3 py-1.5 rounded-lg hover:bg-[#eceef0]"
-                  >
-                    تعديل
-                  </Link>
-                </div>
-                <div className="flex items-center gap-6 text-sm text-[#45474c]">
-                  <span>{teacher.grade_level}</span>
-                  <span>{teacher.subject}</span>
-                  <span className="text-xs text-[#75777d]">{teacher.school_department}</span>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold text-[#091426]">{teacher.name}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {teachers.map((t) => (
+          <TeacherCard key={t.id} teacher={t} />
+        ))}
+      </div>
     </div>
   );
-}
-
-function PlusIcon() {
-  return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
 }

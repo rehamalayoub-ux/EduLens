@@ -1,4 +1,4 @@
-export type UserRole = "supervisor" | "admin";
+export type UserRole = "supervisor" | "director" | "admin";
 export type EvaluationStatus = "draft" | "completed";
 
 export interface Profile {
@@ -6,12 +6,28 @@ export interface Profile {
   user_id: string;
   full_name: string;
   role: UserRole;
+  department?: string;
   created_at: string;
+}
+
+export interface Supervisor {
+  id: string;
+  user_id: string;
+  full_name: string;
+  department: string;
+  stage: string;
+  created_at: string;
+  // computed
+  teacherCount?: number;
+  monthVisits?: number;
+  completedReports?: number;
+  completionRate?: number;
+  lastActivity?: string;
 }
 
 export interface Teacher {
   id: string;
-  user_id: string;
+  user_id: string;          // supervisor's user_id
   name: string;
   subject: string;
   grade_level: string;
@@ -29,17 +45,19 @@ export interface Evaluation {
   subject: string;
   grade_level: string;
   lesson_topic: string;
+  visit_type?: string;
   observation_notes: string | null;
   lesson_planning_score: number | null;
-  classroom_management_score: number | null;
-  student_engagement_score: number | null;
-  teaching_strategies_score: number | null;
-  clarity_score: number | null;
-  assessment_score: number | null;
-  resources_score: number | null;
-  differentiation_score: number | null;
+  classroom_environment_score: number | null;
   time_management_score: number | null;
-  overall_effectiveness_score: number | null;
+  classroom_management_score: number | null;
+  clarity_score: number | null;
+  teaching_strategies_score: number | null;
+  student_engagement_score: number | null;
+  resources_score: number | null;
+  assessment_score: number | null;
+  lesson_closing_score: number | null;
+  professional_performance_score: number | null;
   average_score: number | null;
   ai_strengths: string | null;
   ai_improvement_areas: string | null;
@@ -54,19 +72,7 @@ export interface Evaluation {
 }
 
 export interface RubricCategory {
-  key: keyof Pick<
-    Evaluation,
-    | "lesson_planning_score"
-    | "classroom_management_score"
-    | "student_engagement_score"
-    | "teaching_strategies_score"
-    | "clarity_score"
-    | "assessment_score"
-    | "resources_score"
-    | "differentiation_score"
-    | "time_management_score"
-    | "overall_effectiveness_score"
-  >;
+  key: string;
   title: string;
   description: string;
   details: string[];

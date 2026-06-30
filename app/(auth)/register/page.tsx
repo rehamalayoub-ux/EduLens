@@ -24,7 +24,8 @@ export default function RegisterPage() {
     if (error) { setError("حدث خطأ أثناء إنشاء الحساب"); setLoading(false); return; }
 
     if (data.user) {
-      await supabase.from("profiles").upsert({ user_id: data.user.id, full_name: fullName, role: "supervisor" }, { onConflict: "user_id" });
+      // Role assignment happens server-side to prevent client tampering
+      await fetch("/api/create-profile", { method: "POST" });
     }
     setSuccess(true);
     setLoading(false);

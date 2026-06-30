@@ -53,7 +53,7 @@ export default function TeacherForm({ teacher }: Props) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <Field label="اسم المعلم *" value={form.name} onChange={(v) => update("name", v)} placeholder="أ. محمد أحمد السعيد" required />
         <Field label="المادة الدراسية *" value={form.subject} onChange={(v) => update("subject", v)} placeholder="الرياضيات" required />
-        <Field label="الصف / الشعبة *" value={form.grade_level} onChange={(v) => update("grade_level", v)} placeholder="الثامن (أ)" required />
+        <Field label="الصف *" value={form.grade_level} onChange={(v) => update("grade_level", v)} placeholder="الثامن (أ)" required />
         <Field label="المدرسة / القسم *" value={form.school_department} onChange={(v) => update("school_department", v)} placeholder="مدرسة النور الثانوية" required />
       </div>
       <div className="mt-5">

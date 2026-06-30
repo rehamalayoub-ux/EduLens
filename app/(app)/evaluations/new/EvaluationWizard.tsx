@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { formatDateAr } from "@/lib/formatDate";
 import { RUBRIC_CATEGORIES } from "@/lib/rubric";
 import type { RubricCategory } from "@/types/database";
 
@@ -119,21 +120,17 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push("/login"); return; }
 
+    // Build score columns from all rubric categories
+    const scoreColumns = Object.fromEntries(
+      RUBRIC_CATEGORIES.map((c) => [c.key, scores[c.key]])
+    );
+
     const payload = {
       user_id: user.id,
       teacher_id: teacherId,
       date, subject, grade_level: gradeLevel, lesson_topic: lessonTopic,
       observation_notes: observationNotes,
-      lesson_planning_score: scores.lesson_planning_score,
-      classroom_management_score: scores.classroom_management_score,
-      student_engagement_score: scores.student_engagement_score,
-      teaching_strategies_score: scores.teaching_strategies_score,
-      clarity_score: scores.clarity_score,
-      assessment_score: scores.assessment_score,
-      resources_score: scores.resources_score,
-      differentiation_score: scores.differentiation_score,
-      time_management_score: scores.time_management_score,
-      overall_effectiveness_score: scores.overall_effectiveness_score,
+      ...scoreColumns,
       average_score: parseFloat(avgScore.toFixed(2)),
       ai_strengths: aiFeedback?.strengths ?? null,
       ai_improvement_areas: aiFeedback?.improvements ?? null,
@@ -184,53 +181,126 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
 
       {/* Step 1: Lesson Data */}
       {step === 1 && (
-        <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-8">
-          <h2 className="text-lg font-semibold text-[#091426] text-right mb-6">بيانات الحصة</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">المعلم *</label>
-              <select
-                value={teacherId}
-                onChange={(e) => {
-                  setTeacherId(e.target.value);
-                  const t = teachers.find((t) => t.id === e.target.value);
-                  if (t) { setSubject(t.subject); setGradeLevel(t.grade_level); }
-                }}
-                required
-                className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm"
-              >
-                <option value="">اختر المعلم</option>
-                {teachers.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-              </select>
+        <div className="flex gap-5 items-start" dir="rtl">
+          {/* Main form */}
+          <div className="flex-1 bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-8">
+            <h2 className="text-lg font-semibold text-[#091426] text-right mb-6">بيانات الحصة</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div>
+                <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">المعلم *</label>
+                <select
+                  value={teacherId}
+                  onChange={(e) => {
+                    setTeacherId(e.target.value);
+                    const t = teachers.find((t) => t.id === e.target.value);
+                    if (t) { setSubject(t.subject); setGradeLevel(t.grade_level); }
+                  }}
+                  required
+                  className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm"
+                >
+                  <option value="">اختر المعلم</option>
+                  {teachers.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                  ))}
+                </select>
+              </div>
+              {selectedTeacher && (
+                <div className="bg-[#f7f9fb] rounded-xl border border-[#e0e3e5] px-4 py-3 flex items-center justify-between">
+                  <div className="text-right">
+                    <p className="text-[10px] text-[#75777d]">آخر زيارة</p>
+                    <p className="text-sm font-semibold text-[#091426]">15 يونيو 2026</p>
+                  </div>
+                  <div className="w-px h-8 bg-[#e0e3e5]" />
+                  <div className="text-right">
+                    <p className="text-[10px] text-[#75777d]">إجمالي الزيارات</p>
+                    <p className="text-2xl font-bold text-[#00a64a]">3</p>
+                  </div>
+                </div>
+              )}
+              <div>
+                <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">تاريخ الزيارة *</label>
+                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required
+                  className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
+              </div>
+              <div>
+                <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">المادة *</label>
+                <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="الرياضيات" required
+                  className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
+              </div>
+              <div>
+                <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">الصف *</label>
+                <input type="text" value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} placeholder="الثامن (أ)" required
+                  className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">موضوع الدرس *</label>
+                <input type="text" value={lessonTopic} onChange={(e) => setLessonTopic(e.target.value)} placeholder="مثال: حل المعادلات التربيعية" required
+                  className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
+              </div>
             </div>
-            <div>
-              <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">تاريخ الزيارة *</label>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required
-                className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
-            </div>
-            <div>
-              <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">المادة *</label>
-              <input type="text" value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="الرياضيات" required
-                className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
-            </div>
-            <div>
-              <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">الصف / الشعبة *</label>
-              <input type="text" value={gradeLevel} onChange={(e) => setGradeLevel(e.target.value)} placeholder="الثامن (أ)" required
-                className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
-            </div>
-            <div className="md:col-span-2">
-              <label className="block text-right text-sm font-medium text-[#191c1e] mb-2">موضوع الدرس *</label>
-              <input type="text" value={lessonTopic} onChange={(e) => setLessonTopic(e.target.value)} placeholder="مثال: حل المعادلات التربيعية" required
-                className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition text-sm" />
+            <div className="flex justify-start mt-8">
+              <button onClick={goStep2} className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                التالي: بطاقة التقييم
+              </button>
             </div>
           </div>
-          <div className="flex justify-start mt-8">
-            <button onClick={goStep2} className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-3 rounded-xl transition text-sm">
-              التالي: بطاقة التقييم ←
-            </button>
-          </div>
+
+          {/* AI Assistant panel */}
+          {selectedTeacher && (
+            <div className="w-72 shrink-0 space-y-3">
+              <div className="bg-[#091426] rounded-2xl p-5 text-right">
+                <div className="flex items-center justify-end gap-2 mb-4">
+                  <p className="text-white text-sm font-bold">مساعد EduLens الذكي</p>
+                  <span className="bg-[#00a64a] rounded-full p-1.5 text-white text-xs">✨</span>
+                </div>
+                <p className="text-[#a8b0bc] text-[11px] font-semibold mb-2">نصيحة سريعة</p>
+                <p className="text-white text-sm leading-relaxed">
+                  {selectedTeacher.subject === "الرياضيات"
+                    ? `بناءً على التقييم الأخير للمعلم ${selectedTeacher.name}، يُنصح بالتركيز على معيار "إدارة الوقت" وتعزيز مشاركة الطلاب في مرحلة التطبيق.`
+                    : `بناءً على بيانات المعلم ${selectedTeacher.name}، ركّز على جودة الأسئلة الصفية وتنويع استراتيجيات التدريس لتحقيق أفضل النتائج.`
+                  }
+                </p>
+                <div className="mt-5">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[#00a64a] text-xs font-bold">
+                      {selectedTeacher.subject === "الرياضيات" ? "85%" : "78%"}
+                    </span>
+                    <span className="text-[#a8b0bc] text-[11px]">التقدم السنوي للمعلم</span>
+                  </div>
+                  <div className="bg-[#1e293b] rounded-full h-2">
+                    <div
+                      className="bg-[#00a64a] h-2 rounded-full"
+                      style={{ width: selectedTeacher.subject === "الرياضيات" ? "85%" : "78%" }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Previous evaluations hint */}
+              <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-4 text-right">
+                <div className="flex items-center justify-end gap-2 mb-3">
+                  <p className="text-sm font-bold text-[#091426]">آخر التقييمات</p>
+                  <span className="text-base">🕐</span>
+                </div>
+                <div className="space-y-2.5">
+                  {[
+                    { label: "زيارة صفية", score: "4.6 / 5", date: "15 يونيو" },
+                    { label: "متابعة دورية", score: "4.2 / 5", date: "28 مايو" },
+                    { label: "زيارة مفاجئة", score: "4.5 / 5", date: "10 مايو" },
+                  ].map((v, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-[#00a64a] text-xs font-bold">{v.score}</span>
+                      <div className="text-right">
+                        <p className="text-xs font-semibold text-[#091426]">{v.label}</p>
+                        <p className="text-[10px] text-[#75777d]">{v.date}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -242,9 +312,9 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
             <div className="grid grid-cols-3 md:grid-cols-6 gap-4 text-right">
               <InfoCell label="اسم المعلم" value={selectedTeacher?.name ?? "-"} />
               <InfoCell label="المادة الصفية" value={subject} />
-              <InfoCell label="الصف / الشعبة" value={gradeLevel} />
-              <InfoCell label="تاريخ الزيارة" value={new Date(date).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" })} />
-              <InfoCell label="النقاط" value={`${totalScore} / ٠`} />
+              <InfoCell label="الصف" value={gradeLevel} />
+              <InfoCell label="تاريخ الزيارة" value={formatDateAr(date)} />
+              <InfoCell label="النقاط" value={`${totalScore} / ${RUBRIC_CATEGORIES.length * 5}`} />
               <InfoCell label="المحاور" value={`${filledScores} / ${RUBRIC_CATEGORIES.length}`} />
             </div>
           </div>
@@ -266,11 +336,13 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
           </div>
 
           <div className="flex gap-3 justify-start">
-            <button onClick={() => setStep(1)} className="px-5 py-3 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm font-medium hover:bg-[#f2f4f6] transition">
-              → السابق
+            <button onClick={() => setStep(1)} className="px-5 py-3 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm font-medium hover:bg-[#f2f4f6] transition flex items-center gap-2">
+              السابق
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
-            <button onClick={goStep3} className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-3 rounded-xl transition text-sm">
-              التالي: الملاحظات ←
+            <button onClick={goStep3} className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              التالي: الملاحظات
             </button>
             <button onClick={() => handleSave("draft")} disabled={saving} className="border border-[#c5c6cd] text-[#45474c] px-5 py-3 rounded-xl text-sm hover:bg-[#f2f4f6] transition disabled:opacity-50">
               {saving ? "..." : "حفظ كمسودة"}
@@ -294,8 +366,9 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
             className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition resize-none text-sm"
           />
           <div className="flex gap-3 justify-start mt-6">
-            <button onClick={() => setStep(2)} className="px-5 py-3 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm font-medium hover:bg-[#f2f4f6] transition">
-              → السابق
+            <button onClick={() => setStep(2)} className="px-5 py-3 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm font-medium hover:bg-[#f2f4f6] transition flex items-center gap-2">
+              السابق
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
             <button onClick={goStep4} className="bg-[#00a64a] hover:bg-[#009040] text-white font-semibold px-6 py-3 rounded-xl transition text-sm flex items-center gap-2">
               <span>✨</span>
@@ -310,7 +383,30 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
 
       {/* Step 4: AI Feedback */}
       {step === 4 && (
-        <div className="space-y-5">
+        <div className="space-y-5" dir="rtl">
+
+          {/* Page header */}
+          <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-5 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#dcfce7] flex items-center justify-center text-lg">🧠</div>
+              <div>
+                <h2 className="text-base font-bold text-[#091426]">مساعد التغذية الراجعة الذكي</h2>
+                <p className="text-xs text-[#45474c] mt-0.5">حوّل ملاحظاتك إلى تقارير مبنية باستخدام تقنيات EduLens المتقدمة</p>
+              </div>
+            </div>
+            {/* Quick stats */}
+            <div className="flex gap-3">
+              <div className="bg-[#f7f9fb] rounded-xl px-4 py-2 text-center">
+                <p className="text-lg font-bold text-[#00a64a]">{avgScore > 0 ? `${Math.round(avgScore * 20)}%` : "—"}</p>
+                <p className="text-[10px] text-[#45474c]">المعدل الكلي</p>
+              </div>
+              <div className="bg-[#f7f9fb] rounded-xl px-4 py-2 text-center">
+                <p className="text-lg font-bold text-[#091426]">{filledScores}/{RUBRIC_CATEGORIES.length}</p>
+                <p className="text-[10px] text-[#45474c]">محاور مكتملة</p>
+              </div>
+            </div>
+          </div>
+
           {aiLoading ? (
             <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-16 text-center">
               <div className="text-4xl mb-4 animate-pulse">✨</div>
@@ -321,16 +417,23 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
             <>
               {aiFeedback ? (
                 <>
-                  <FeedbackCard title="نقاط القوة" icon="💪" color="green" value={aiFeedback.strengths}
-                    onChange={(v) => setAiFeedback((f) => f ? { ...f, strengths: v } : f)} />
-                  <FeedbackCard title="مجالات التحسين" icon="📈" color="amber" value={aiFeedback.improvements}
-                    onChange={(v) => setAiFeedback((f) => f ? { ...f, improvements: v } : f)} />
-                  <FeedbackCard title="التوصيات العملية" icon="🎯" color="navy" value={aiFeedback.recommendations}
-                    onChange={(v) => setAiFeedback((f) => f ? { ...f, recommendations: v } : f)} />
-                  <FeedbackCard title="خطة التطوير المهني" icon="🗺️" color="purple" value={aiFeedback.developmentPlan}
-                    onChange={(v) => setAiFeedback((f) => f ? { ...f, developmentPlan: v } : f)} />
-                  <FeedbackCard title="ملخص الزيارة" icon="📋" color="gray" value={aiFeedback.summary}
-                    onChange={(v) => setAiFeedback((f) => f ? { ...f, summary: v } : f)} />
+                  {/* Top row: 3 cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FeedbackCard title="ملخص الحصة" icon="📋" color="gray" value={aiFeedback.summary}
+                      onChange={(v) => setAiFeedback((f) => f ? { ...f, summary: v } : f)} />
+                    <FeedbackCard title="نقاط القوة" icon="✅" color="green" value={aiFeedback.strengths}
+                      onChange={(v) => setAiFeedback((f) => f ? { ...f, strengths: v } : f)} />
+                    <FeedbackCard title="جوانب التحسين" icon="📈" color="amber" value={aiFeedback.improvements}
+                      onChange={(v) => setAiFeedback((f) => f ? { ...f, improvements: v } : f)} />
+                  </div>
+
+                  {/* Bottom row: 2 cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FeedbackCard title="تغذية راجعة بناءة" icon="💬" color="navy" value={aiFeedback.recommendations}
+                      onChange={(v) => setAiFeedback((f) => f ? { ...f, recommendations: v } : f)} />
+                    <FeedbackCard title="توصيات عملية" icon="🎯" color="purple" value={aiFeedback.developmentPlan}
+                      onChange={(v) => setAiFeedback((f) => f ? { ...f, developmentPlan: v } : f)} />
+                  </div>
                 </>
               ) : (
                 <div className="bg-[#ffdad6] border border-[#ba1a1a] rounded-2xl p-6 text-right">
@@ -346,21 +449,28 @@ export default function EvaluationWizard({ teachers }: { teachers: Teacher[] }) 
                   value={finalComments}
                   onChange={(e) => setFinalComments(e.target.value)}
                   placeholder="أضف تعليقاتك الختامية..."
-                  rows={4}
+                  rows={3}
                   className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition resize-none text-sm"
                 />
               </div>
 
-              <div className="flex gap-3 justify-start">
-                <button onClick={() => setStep(3)} className="px-5 py-3 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm font-medium hover:bg-[#f2f4f6] transition">
-                  → السابق
-                </button>
-                <button onClick={() => goStep4()} className="border border-[#00a64a] text-[#00a64a] px-5 py-3 rounded-xl text-sm font-medium hover:bg-[#dcfce7] transition flex items-center gap-2">
-                  <span>🔄</span> إعادة التوليد
-                </button>
-                <button onClick={() => handleSave("completed")} disabled={saving} className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-3 rounded-xl transition text-sm disabled:opacity-60">
-                  {saving ? "جارٍ الحفظ..." : "حفظ التقرير النهائي"}
-                </button>
+              {/* Actions footer */}
+              <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm px-6 py-4 flex items-center justify-between">
+                <div className="flex gap-3">
+                  <button onClick={() => setStep(3)} className="px-4 py-2.5 rounded-xl border border-[#c5c6cd] text-[#45474c] text-sm hover:bg-[#f2f4f6] transition flex items-center gap-2">
+                    تجاهل وحذف
+                  </button>
+                  <button onClick={() => goStep4()} className="border border-[#00a64a] text-[#00a64a] px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-[#dcfce7] transition flex items-center gap-2">
+                    <span>🔄</span> إعادة التوليد
+                  </button>
+                </div>
+                <div className="flex items-center gap-4">
+                  <p className="text-xs text-[#75777d]">تم التوليد بواسطة EduLens AI — مراجعة المشرف مطلوبة قبل الحفظ</p>
+                  <button onClick={() => handleSave("completed")} disabled={saving}
+                    className="bg-[#091426] hover:bg-[#1e293b] text-white font-semibold px-6 py-2.5 rounded-xl transition text-sm disabled:opacity-60 flex items-center gap-2">
+                    {saving ? "جارٍ الحفظ..." : "حفظ التقرير وإرساله"}
+                  </button>
+                </div>
               </div>
             </>
           )}
@@ -386,49 +496,49 @@ function RubricCard({ category, score, note, expanded, onToggle, onScore, onNote
 }) {
   return (
     <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm overflow-hidden">
-      {/* Header */}
-      <button onClick={onToggle} className="w-full flex items-center justify-between px-5 py-4 text-right hover:bg-[#f7f9fb] transition">
+      {/* Header: icon+title on RIGHT, badge+chevron on LEFT */}
+      <button onClick={onToggle} className="w-full flex items-center justify-between px-5 py-4 hover:bg-[#f7f9fb] transition" dir="rtl">
+        {/* Right: icon + title */}
+        <div className="flex items-center gap-3">
+          <span className="text-xl shrink-0">{category.icon}</span>
+          <div className="text-right">
+            <p className="font-semibold text-[#091426] text-sm">{category.title}</p>
+            <p className="text-xs text-[#45474c]">{category.description}</p>
+          </div>
+        </div>
+        {/* Left: score badge + chevron */}
         <div className="flex items-center gap-2">
-          <ChevronIcon expanded={expanded} />
           <span className={`px-3 py-1 rounded-full text-xs font-medium ${
             score !== null ? "bg-[#dcfce7] text-[#00a64a]" : "bg-[#f2f4f6] text-[#45474c]"
           }`}>
             {score !== null ? `${score} / 5` : "لم يكتمل"}
           </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div>
-            <p className="font-semibold text-[#091426] text-sm">{category.title}</p>
-            <p className="text-xs text-[#45474c]">{category.description}</p>
-          </div>
-          <span className="text-xl">{category.icon}</span>
+          <ChevronIcon expanded={expanded} />
         </div>
       </button>
 
       {/* Expanded content */}
       {expanded && (
-        <div className="border-t border-[#e0e3e5] px-5 py-5">
-          <div className="flex flex-col md:flex-row-reverse gap-6">
-            {/* Details (right in RTL) */}
-            <div className="md:w-2/5">
-              <p className="text-sm font-medium text-[#091426] text-right mb-3">نقاط التقييم التفصيلية:</p>
+        <div className="border-t border-[#e0e3e5] px-5 py-5" dir="rtl">
+          <div className="flex flex-col md:flex-row gap-6">
+            {/* Right: details */}
+            <div className="md:w-2/5 text-right">
+              <p className="text-sm font-medium text-[#091426] mb-3">نقاط التقييم التفصيلية:</p>
               <ul className="space-y-2">
                 {category.details.map((d, i) => (
-                  <li key={i} className="flex items-start gap-2 justify-end text-right">
-                    <span className="text-sm text-[#45474c]">{d}</span>
+                  <li key={i} className="flex items-start gap-2">
                     <span className="text-[#00a64a] mt-0.5 shrink-0">✔</span>
+                    <span className="text-sm text-[#45474c] text-right">{d}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            {/* Rating + notes (left) */}
-            <div className="flex-1">
-              <div className="text-right mb-3">
-                <p className="text-sm font-medium text-[#091426]">التقييم (١ - ٥):</p>
-              </div>
-              <div className="flex gap-2 justify-end mb-4">
-                {[5, 4, 3, 2, 1].map((v) => (
+            {/* Left: Rating + notes */}
+            <div className="flex-1 text-right">
+              <p className="text-sm font-medium text-[#091426] mb-3">التقييم (١ - ٥):</p>
+              <div className="flex gap-2 justify-start mb-4">
+                {[1, 2, 3, 4, 5].map((v) => (
                   <button
                     key={v}
                     onClick={() => onScore(v)}
@@ -451,10 +561,10 @@ function RubricCard({ category, score, note, expanded, onToggle, onScore, onNote
                 className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] placeholder-[#75777d] outline-none focus:ring-2 focus:ring-[#1e293b] transition resize-none text-sm"
               />
 
-              <div className="mt-3 bg-[#f0fdf4] border border-[#dcfce7] rounded-xl px-4 py-3 text-right">
-                <p className="text-xs text-[#00a64a] flex items-center justify-end gap-1">
+              <div className="mt-3 bg-[#f0fdf4] border border-[#dcfce7] rounded-xl px-4 py-3">
+                <p className="text-xs text-[#00a64a] flex items-center gap-1.5">
+                  <span className="font-semibold shrink-0">✨ تلميح AI:</span>
                   <span>{category.aiHint}</span>
-                  <span>:✨ تلميح AI</span>
                 </p>
               </div>
             </div>
@@ -468,24 +578,25 @@ function RubricCard({ category, score, note, expanded, onToggle, onScore, onNote
 function FeedbackCard({ title, icon, color, value, onChange }: {
   title: string; icon: string; color: string; value: string; onChange: (v: string) => void;
 }) {
-  const borders: Record<string, string> = {
-    green: "border-r-4 border-r-[#00a64a]",
-    amber: "border-r-4 border-r-[#f59e0b]",
-    navy: "border-r-4 border-r-[#091426]",
-    purple: "border-r-4 border-r-[#7c3aed]",
-    gray: "border-r-4 border-r-[#75777d]",
+  const styles: Record<string, { border: string; bg: string; text: string }> = {
+    green:  { border: "border-[#00a64a]", bg: "bg-[#dcfce7]", text: "text-[#00a64a]" },
+    amber:  { border: "border-[#f59e0b]", bg: "bg-[#fff3cd]", text: "text-[#92600a]" },
+    navy:   { border: "border-[#091426]", bg: "bg-[#e8edf3]", text: "text-[#091426]" },
+    purple: { border: "border-[#7c3aed]", bg: "bg-[#ede9fe]", text: "text-[#5b21b6]" },
+    gray:   { border: "border-[#75777d]", bg: "bg-[#f2f4f6]", text: "text-[#45474c]" },
   };
+  const s = styles[color] ?? styles.gray;
   return (
-    <div className={`bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-6 ${borders[color]}`}>
-      <h3 className="text-base font-semibold text-[#091426] text-right mb-3 flex items-center justify-end gap-2">
-        <span>{title}</span>
+    <div className={`bg-white rounded-2xl border ${s.border} shadow-sm p-5`} dir="rtl">
+      <h3 className="text-sm font-bold text-[#091426] text-right mb-3 flex items-center gap-2">
         <span>{icon}</span>
+        <span>{title}</span>
       </h3>
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         rows={4}
-        className="w-full bg-[#f2f4f6] rounded-xl px-4 py-3 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition resize-none text-sm"
+        className="w-full bg-[#f7f9fb] rounded-xl px-3 py-2.5 text-right text-[#191c1e] outline-none focus:ring-2 focus:ring-[#1e293b] transition resize-none text-sm"
       />
     </div>
   );

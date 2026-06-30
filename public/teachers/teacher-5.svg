@@ -1,0 +1,52 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#1c3d4e"/>
+  <!-- Suit -->
+  <path d="M 20 200 C 20 162 55 152 100 156 C 145 152 180 162 180 200Z" fill="#122838"/>
+  <!-- Shirt -->
+  <path d="M 91 149 L 100 162 L 109 149 L 100 145Z" fill="#e8e0d0"/>
+  <path d="M 91 149 L 80 158 L 100 162Z" fill="#e8e0d0"/>
+  <path d="M 109 149 L 120 158 L 100 162Z" fill="#e8e0d0"/>
+  <!-- Neck -->
+  <path d="M 87 128 Q 87 155 100 158 Q 113 155 113 128 Q 106 133 100 134 Q 94 133 87 128Z" fill="#9a6535"/>
+  <!-- Head -->
+  <ellipse cx="100" cy="100" rx="40" ry="44" fill="#9a6535"/>
+  <!-- Hair -->
+  <path d="M 60 86 C 60 60 78 52 100 51 C 122 52 140 60 140 86 C 137 70 128 60 100 59 C 72 60 63 70 60 86Z" fill="#0a0808"/>
+  <path d="M 60 86 C 58 76 59 66 62 60 C 64 68 63 78 65 86Z" fill="#0a0808"/>
+  <path d="M 140 86 C 142 76 141 66 138 60 C 136 68 137 78 135 86Z" fill="#0a0808"/>
+  <!-- Ears -->
+  <ellipse cx="60" cy="104" rx="7" ry="10" fill="#8a5828"/>
+  <ellipse cx="62" cy="104" rx="4" ry="7" fill="#9a6535"/>
+  <ellipse cx="140" cy="104" rx="7" ry="10" fill="#8a5828"/>
+  <ellipse cx="138" cy="104" rx="4" ry="7" fill="#9a6535"/>
+  <!-- Beard/stubble shadow -->
+  <ellipse cx="100" cy="122" rx="33" ry="18" fill="#6a4020" opacity="0.45"/>
+  <path d="M 68 110 C 65 120 68 138 100 142 C 132 138 135 120 132 110 C 128 118 116 128 100 130 C 84 128 72 118 68 110Z" fill="#5a3418" opacity="0.38"/>
+  <!-- Left eye white -->
+  <ellipse cx="84" cy="98" rx="8" ry="6.5" fill="white"/>
+  <!-- Left iris (dark brown) -->
+  <circle cx="84" cy="99" r="4.5" fill="#1a0e00"/>
+  <circle cx="84" cy="99" r="2.5" fill="#080400"/>
+  <circle cx="85.8" cy="97.5" r="1.2" fill="white"/>
+  <!-- Right eye white -->
+  <ellipse cx="116" cy="98" rx="8" ry="6.5" fill="white"/>
+  <!-- Right iris -->
+  <circle cx="116" cy="99" r="4.5" fill="#1a0e00"/>
+  <circle cx="116" cy="99" r="2.5" fill="#080400"/>
+  <circle cx="117.8" cy="97.5" r="1.2" fill="white"/>
+  <!-- Eyelids -->
+  <path d="M 76 96 Q 84 91 92 96" stroke="#080400" stroke-width="1.5" fill="none"/>
+  <path d="M 108 96 Q 116 91 124 96" stroke="#080400" stroke-width="1.5" fill="none"/>
+  <!-- Eyebrows (heavy) -->
+  <path d="M 74 86 Q 84 81 93 85" stroke="#0a0808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M 107 85 Q 116 81 126 86" stroke="#0a0808" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <!-- Nose (broader) -->
+  <path d="M 100 104 L 96 117" stroke="#7a4e22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M 100 104 L 104 117" stroke="#7a4e22" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  <path d="M 92 120 Q 100 124 108 120" stroke="#7a4e22" stroke-width="1.8" fill="none"/>
+  <!-- Moustache -->
+  <path d="M 86 128 Q 93 133 100 130 Q 107 133 114 128 Q 107 126 100 127 Q 93 126 86 128Z" fill="#0a0808" opacity="0.75"/>
+  <!-- Mouth -->
+  <path d="M 88 133 Q 100 141 112 133" stroke="#7a4022" stroke-width="2" fill="none" stroke-linecap="round"/>
+</svg>

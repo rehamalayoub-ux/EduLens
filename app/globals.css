@@ -52,4 +52,14 @@ body {
   background-color: #f7f9fb;
   color: #191c1e;
   direction: rtl;
+  text-align: right;
+}
+
+input, textarea, select {
+  text-align: right;
+  direction: rtl;
+}
+
+input::placeholder, textarea::placeholder {
+  text-align: right;
 }

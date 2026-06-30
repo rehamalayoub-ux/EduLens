@@ -1,0 +1,45 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <circle cx="100" cy="100" r="100" fill="#1e4a2e"/>
+  <!-- Abaya/dress -->
+  <path d="M 15 200 C 15 158 50 148 100 152 C 150 148 185 158 185 200Z" fill="#122e1c"/>
+  <!-- Hijab outer (olive/forest green) -->
+  <path d="M 54 112 C 51 84 58 60 100 58 C 142 60 149 84 146 112 C 149 140 143 162 100 166 C 57 162 51 140 54 112Z" fill="#2a5a30"/>
+  <!-- Hijab bottom deeper shadow -->
+  <path d="M 56 124 C 53 144 57 162 100 166 C 143 162 147 144 144 124 C 139 138 122 150 100 152 C 78 150 61 138 56 124Z" fill="#1a3e20"/>
+  <!-- Hijab top highlight -->
+  <path d="M 70 68 C 80 60 100 58 100 58 C 100 58 120 60 130 68 C 118 63 100 62 82 68Z" fill="#3a7040" opacity="0.55"/>
+  <!-- Face oval -->
+  <ellipse cx="100" cy="104" rx="32" ry="37" fill="#c07840"/>
+  <!-- Left eye white -->
+  <ellipse cx="86" cy="100" rx="7.5" ry="6" fill="white"/>
+  <!-- Left iris (dark warm brown) -->
+  <circle cx="86" cy="101" r="4.2" fill="#2a1200"/>
+  <circle cx="86" cy="101" r="2.3" fill="#0a0500"/>
+  <circle cx="87.5" cy="99.5" r="1" fill="white"/>
+  <!-- Right eye white -->
+  <ellipse cx="114" cy="100" rx="7.5" ry="6" fill="white"/>
+  <!-- Right iris -->
+  <circle cx="114" cy="101" r="4.2" fill="#2a1200"/>
+  <circle cx="114" cy="101" r="2.3" fill="#0a0500"/>
+  <circle cx="115.5" cy="99.5" r="1" fill="white"/>
+  <!-- Eyelashes top -->
+  <path d="M 78 98 Q 86 93 94 97" stroke="#0a0500" stroke-width="2" fill="none"/>
+  <path d="M 106 97 Q 114 93 122 98" stroke="#0a0500" stroke-width="2" fill="none"/>
+  <!-- Eyebrows -->
+  <path d="M 77 89 Q 86 85 95 88" stroke="#2a1000" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+  <path d="M 105 88 Q 114 85 123 89" stroke="#2a1000" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+  <!-- Nose -->
+  <path d="M 100 108 L 97 117" stroke="#a86030" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M 100 108 L 103 117" stroke="#a86030" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+  <path d="M 94 119 Q 100 122 106 119" stroke="#a86030" stroke-width="1.5" fill="none"/>
+  <!-- Mouth (warm smile) -->
+  <path d="M 88 129 Q 100 139 112 129" stroke="#8a4820" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M 90 129 Q 100 134 110 129 Q 100 132 90 129Z" fill="#c06040" opacity="0.6"/>
+  <!-- Warm cheek blush -->
+  <ellipse cx="74" cy="114" rx="9" ry="5.5" fill="#e07050" opacity="0.2"/>
+  <ellipse cx="126" cy="114" rx="9" ry="5.5" fill="#e07050" opacity="0.2"/>
+  <!-- Smile lines (subtle) -->
+  <path d="M 73 118 Q 76 125 74 130" stroke="#a06030" stroke-width="1" fill="none" opacity="0.3"/>
+  <path d="M 127 118 Q 124 125 126 130" stroke="#a06030" stroke-width="1" fill="none" opacity="0.3"/>
+</svg>
