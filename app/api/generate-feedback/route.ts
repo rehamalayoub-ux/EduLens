@@ -29,15 +29,18 @@ function isValidScores(scores: unknown): scores is Record<string, number> {
 }
 
 export async function POST(req: Request) {
-  // ── 1. Auth check ─────────────────────────────────────────────
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // ── 1. Auth check (demo session bypasses Supabase) ───────────
+  const demoSession = req.headers.get("cookie")?.includes("x-demo-session=1");
+  if (!demoSession) {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      }
+    } catch {
+      // No Supabase configured — allow through
     }
-  } catch {
-    // Demo mode (no Supabase configured) — allow through
   }
 
   // ── 2. Rate limiting ──────────────────────────────────────────
@@ -120,7 +123,7 @@ ${observationNotes || "لا توجد ملاحظات إضافية"}
         headers: {
           "Authorization": `Bearer ${apiKey}`,
           "Content-Type": "application/json",
-          "HTTP-Referer": "https://edulens.vercel.app",
+          "HTTP-Referer": "https://edulens-self.vercel.app",
           "X-Title": "EduLens",
         },
         body: JSON.stringify({
