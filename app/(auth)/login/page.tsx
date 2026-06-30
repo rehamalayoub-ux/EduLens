@@ -17,6 +17,7 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error");
   const errorMsg = errorCode ? ERROR_MESSAGES[errorCode] ?? ERROR_MESSAGES.unknown : null;
+  const registered = searchParams.get("registered") === "1";
   const [showPassword, setShowPassword] = useState(false);
 
   return (
@@ -82,6 +83,9 @@ function LoginForm() {
               </div>
             </div>
 
+            {registered && (
+              <p className="text-right text-sm text-[#166534] bg-[#f0fdf4] rounded-xl px-4 py-2 border border-[#bbf7d0]">تم إنشاء الحساب — سجّل الدخول الآن</p>
+            )}
             {errorMsg && (
               <p className="text-right text-sm text-[#ba1a1a] bg-[#fff1f1] rounded-xl px-4 py-2">{errorMsg}</p>
             )}
