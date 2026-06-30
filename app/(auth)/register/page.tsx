@@ -14,7 +14,8 @@ const ERROR_MESSAGES: Record<string, string> = {
 function RegisterForm() {
   const searchParams = useSearchParams();
   const errorCode = searchParams.get("error");
-  const errorMsg  = errorCode ? ERROR_MESSAGES[errorCode] ?? ERROR_MESSAGES.unknown : null;
+  const detail    = searchParams.get("detail");
+  const errorMsg  = errorCode ? (detail ? decodeURIComponent(detail) : ERROR_MESSAGES[errorCode] ?? ERROR_MESSAGES.unknown) : null;
   const [showPassword, setShowPassword] = useState(false);
 
   return (
