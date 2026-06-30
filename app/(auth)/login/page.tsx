@@ -18,6 +18,15 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    // Demo credentials bypass
+    if (email === "demo@edulens.com" && password === "demo1234") {
+      await fetch("/api/demo-login", { method: "POST" });
+      router.refresh();
+      router.push("/dashboard");
+      return;
+    }
+
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signInWithPassword({ email, password });
     if (authError) {
@@ -84,6 +93,11 @@ export default function LoginPage() {
           </div>
 
           {error && <p className="text-right text-sm text-[#ba1a1a] mt-2">{error}</p>}
+          <div className="mt-2 p-3 bg-[#f0fdf4] rounded-xl border border-[#bbf7d0] text-right">
+            <p className="text-xs text-[#166534] font-semibold mb-1">حساب تجريبي للدخول الفوري:</p>
+            <p className="text-xs text-[#166534]">البريد: <span className="font-mono">demo@edulens.com</span></p>
+            <p className="text-xs text-[#166534]">كلمة المرور: <span className="font-mono">demo1234</span></p>
+          </div>
 
           <button type="submit" disabled={loading}
             className="mt-5 w-full bg-[#091426] hover:bg-[#1e293b] text-white font-semibold text-sm rounded-xl py-3.5 flex items-center justify-center gap-2 transition disabled:opacity-60">

@@ -31,6 +31,13 @@ export async function proxy(request: NextRequest) {
     },
   });
 
+  // Allow demo session (bypass Supabase auth)
+  const demoSession = request.cookies.get("x-demo-session")?.value;
+  if (demoSession === "1") {
+    if (isPublic) return NextResponse.redirect(new URL("/dashboard", request.url));
+    return supabaseResponse;
+  }
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -41,10 +48,7 @@ export async function proxy(request: NextRequest) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   } catch {
-    // If auth check fails, redirect to login for protected routes
-    if (!isPublic && pathname !== "/") {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
+    // If auth check fails, allow through rather than redirect loop
   }
 
   return supabaseResponse;
