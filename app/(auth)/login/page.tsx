@@ -119,19 +119,6 @@ function LoginForm() {
             </form>
           </div>
 
-          {/* Teacher cards preview */}
-          <div className="px-6 py-5">
-            <p className="text-[#93c5fd] text-xs font-semibold mb-4 text-right flex items-center gap-2">
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#38bdf8] animate-pulse" />
-              معلمون مسجّلون في النظام التجريبي
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {DEMO_TEACHERS.map(t => <TeacherPreviewCard key={t.name} t={t} />)}
-            </div>
-            <p className="text-center text-[#475569] text-[10px] mt-4">
-              اضغط "دخول تجريبي فوري" لاستعراض التقييمات الكاملة، التوصيات، والتحليلات
-            </p>
-          </div>
         </div>
       </div>
 
