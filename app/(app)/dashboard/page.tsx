@@ -13,7 +13,7 @@ export default async function DashboardPage() {
   let allEvaluations: typeof DEMO_EVALUATIONS = [];
   let thisMonthEvals: typeof DEMO_EVALUATIONS = [];
 
-  let firstName = "المشرف";
+  let firstName = "رهام";
 
   if (isDemo) {
     teachers = DEMO_TEACHERS;
@@ -26,7 +26,8 @@ export default async function DashboardPage() {
       if (!user) redirect("/login");
 
       const fullName: string = user.user_metadata?.full_name ?? "";
-      firstName = fullName.split(" ")[0] || "المشرف";
+      const emailName = (user.email ?? "").split("@")[0];
+      firstName = fullName.split(" ")[0] || emailName || "المشرف";
 
       const now = new Date();
       const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
