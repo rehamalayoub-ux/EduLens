@@ -13,6 +13,8 @@ export default async function DashboardPage() {
   let allEvaluations: typeof DEMO_EVALUATIONS = [];
   let thisMonthEvals: typeof DEMO_EVALUATIONS = [];
 
+  let firstName = "المشرف";
+
   if (isDemo) {
     teachers = DEMO_TEACHERS;
     allEvaluations = DEMO_EVALUATIONS;
@@ -22,6 +24,9 @@ export default async function DashboardPage() {
       const supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) redirect("/login");
+
+      const fullName: string = user.user_metadata?.full_name ?? "";
+      firstName = fullName.split(" ")[0] || "المشرف";
 
       const now = new Date();
       const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
@@ -70,7 +75,9 @@ export default async function DashboardPage() {
     <div>
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-[#45474c]">مرحباً بك، إليك نظرة عامة على أدائك هذا الشهر.</p>
+        <p className="text-xl font-bold text-[#091426]">
+          مرحباً {firstName}، إليك نظرة عامة على أدائك هذا الشهر
+        </p>
         <Link href="/teachers/new"
           className="flex items-center gap-2 bg-[#00a64a] hover:bg-[#009040] text-white font-semibold px-4 py-2.5 rounded-xl transition text-sm">
           <PlusIcon />
