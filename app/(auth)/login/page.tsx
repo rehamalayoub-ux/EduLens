@@ -92,11 +92,6 @@ function LoginForm() {
           </form>
         </div>
 
-        {/* Teacher cards preview */}
-        <p className="text-xs text-[#75777d] text-center mb-3">معلمون مسجّلون في النظام التجريبي</p>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {DEMO_TEACHERS.map(t => <TeacherPreviewCard key={t.name} t={t} />)}
-        </div>
       </div>
 
       {/* Login form */}
