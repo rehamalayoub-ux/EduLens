@@ -21,38 +21,62 @@ function pickColor(name: string) {
 }
 
 const DEMO_TEACHERS = [
-  { name: "أحمد محمد السالم",    subject: "الرياضيات",    grade: "الصف العاشر",      visits: 3, score: 92 },
-  { name: "فاطمة علي الزهراني",  subject: "العلوم",        grade: "الصف الثامن",      visits: 1, score: null },
-  { name: "خالد عبدالله العمري", subject: "اللغة العربية", grade: "الصف الثاني عشر", visits: 2, score: 76 },
-  { name: "نورة سعد القحطاني",   subject: "الإنجليزية",   grade: "الصف العاشر",      visits: 4, score: 95 },
-  { name: "محمد إبراهيم الشمري", subject: "التاريخ",       grade: "الصف الحادي عشر", visits: 1, score: null },
-  { name: "سلمى عمر البلوي",     subject: "التربية الإسلامية", grade: "الصف التاسع", visits: 6, score: 90 },
+  { name: "أحمد محمد السالم",    subject: "الرياضيات",         grade: "الصف العاشر",      visits: 3, score: 92 },
+  { name: "فاطمة علي الزهراني",  subject: "العلوم",             grade: "الصف الثامن",      visits: 1, score: null },
+  { name: "خالد عبدالله العمري", subject: "اللغة العربية",      grade: "الصف الثاني عشر", visits: 2, score: 76 },
+  { name: "نورة سعد القحطاني",   subject: "اللغة الإنجليزية",  grade: "الصف العاشر",      visits: 4, score: 95 },
+  { name: "محمد إبراهيم الشمري", subject: "التاريخ",            grade: "الصف الحادي عشر", visits: 1, score: null },
+  { name: "سلمى عمر البلوي",     subject: "التربية الإسلامية", grade: "الصف التاسع",      visits: 6, score: 90 },
 ];
+
+function ScoreBar({ score }: { score: number | null }) {
+  if (!score) return <span className="text-[#c5c6cd] text-xs font-bold">لم يُقيَّم بعد</span>;
+  const color = score >= 90 ? "#00a64a" : score >= 75 ? "#f59e0b" : "#ba1a1a";
+  const label = score >= 90 ? "ممتاز" : score >= 75 ? "جيد" : "يحتاج تطوير";
+  return (
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-1">
+        <span className="text-[10px] font-semibold" style={{ color }}>{label}</span>
+        <span className="text-xs font-bold" style={{ color }}>{score}%</span>
+      </div>
+      <div className="h-1.5 bg-[#f2f4f6] rounded-full overflow-hidden">
+        <div className="h-1.5 rounded-full transition-all" style={{ width: `${score}%`, backgroundColor: color }} />
+      </div>
+    </div>
+  );
+}
 
 function TeacherPreviewCard({ t }: { t: typeof DEMO_TEACHERS[0] }) {
   const initials = t.name.split(" ").slice(0, 2).map(w => w[0]).join("");
   const color = pickColor(t.name);
-  const scoreColor = t.score ? (t.score >= 90 ? "#00a64a" : t.score >= 75 ? "#f59e0b" : "#ba1a1a") : "#c5c6cd";
   return (
-    <div className="bg-white rounded-2xl border border-[#e0e3e5] shadow-sm p-4 flex flex-col items-center text-center gap-2">
-      <div className="w-14 h-14 rounded-full flex items-center justify-center text-white text-lg font-bold shadow"
-        style={{ background: color }}>
-        {initials}
-      </div>
-      <div>
-        <p className="text-[#091426] text-xs font-bold leading-tight">{t.name}</p>
-        <p className="text-[#75777d] text-[10px] mt-0.5">{t.subject} • {t.grade}</p>
-      </div>
-      <div className="w-full grid grid-cols-2 gap-2 mt-1">
-        <div className="bg-[#f7f9fb] rounded-xl p-2 text-center">
-          <p className="text-sm font-bold text-[#091426]">{t.visits}</p>
-          <p className="text-[9px] text-[#75777d]">زيارات</p>
+    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4 flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 rounded-full flex items-center justify-center text-white text-base font-bold shadow-lg shrink-0"
+          style={{ background: color }}>
+          {initials}
         </div>
-        <div className="bg-[#f7f9fb] rounded-xl p-2 text-center">
-          <p className="text-sm font-bold" style={{ color: scoreColor }}>{t.score ? `${t.score}%` : "—"}</p>
-          <p className="text-[9px] text-[#75777d]">التقييم</p>
+        <div className="flex-1 min-w-0 text-right">
+          <p className="text-white text-sm font-bold leading-tight truncate">{t.name}</p>
+          <p className="text-[#93c5fd] text-[11px] mt-0.5">{t.subject}</p>
+          <p className="text-[#64748b] text-[10px]">{t.grade}</p>
         </div>
       </div>
+      <div className="flex gap-2">
+        <div className="flex-1 bg-white/10 rounded-xl p-2 text-center">
+          <p className="text-white text-sm font-bold">{t.visits}</p>
+          <p className="text-[#93c5fd] text-[9px]">زيارات</p>
+        </div>
+        <div className="flex-1 bg-white/10 rounded-xl p-2 text-center">
+          {t.score
+            ? <><p className="text-sm font-bold" style={{ color: t.score >= 90 ? "#4ade80" : t.score >= 75 ? "#fbbf24" : "#f87171" }}>{t.score}%</p>
+                <p className="text-[#93c5fd] text-[9px]">التقييم</p></>
+            : <><p className="text-[#64748b] text-sm font-bold">—</p>
+                <p className="text-[#93c5fd] text-[9px]">التقييم</p></>
+          }
+        </div>
+      </div>
+      <ScoreBar score={t.score} />
     </div>
   );
 }
@@ -74,24 +98,41 @@ function LoginForm() {
         <p className="text-[#45474c] text-sm font-medium">تقييم المعلمين بذكاء ووضوح</p>
       </div>
 
-      {/* Demo preview section */}
+      {/* Demo section — banner + teacher cards */}
       <div className="w-full max-w-2xl mb-6">
-        <div className="bg-gradient-to-l from-[#1e3a5f] to-[#091426] rounded-3xl px-6 py-5 shadow-md mb-4 flex flex-col sm:flex-row items-center gap-4">
-          <div className="flex-1 text-right">
-            <p className="text-white font-bold text-base mb-0.5">جرّب EduLens الآن — مجاناً وبدون حساب</p>
-            <p className="text-[#93c5fd] text-xs">استعرض لوحات التقييم والمعلمين مباشرة</p>
-          </div>
-          <form method="POST" action="/api/demo-login" className="shrink-0">
-            <button type="submit"
-              className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#0c1a2e] font-bold px-6 py-2.5 rounded-xl text-sm transition whitespace-nowrap flex items-center gap-2">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-              </svg>
-              دخول تجريبي فوري
-            </button>
-          </form>
-        </div>
+        <div className="bg-gradient-to-br from-[#0f2744] via-[#091426] to-[#0c1f3d] rounded-3xl shadow-xl overflow-hidden">
 
+          {/* Top banner */}
+          <div className="px-6 pt-6 pb-4 flex flex-col sm:flex-row items-center gap-4 border-b border-white/10">
+            <div className="flex-1 text-right">
+              <p className="text-white font-bold text-base mb-0.5">جرّب EduLens الآن — مجاناً وبدون حساب</p>
+              <p className="text-[#93c5fd] text-xs">استعرض لوحات التقييم والمعلمين مباشرة — البيانات أدناه حقيقية من البيئة التجريبية</p>
+            </div>
+            <form method="POST" action="/api/demo-login" className="shrink-0">
+              <button type="submit"
+                className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-[#0c1a2e] font-bold px-6 py-2.5 rounded-xl text-sm transition whitespace-nowrap flex items-center gap-2 shadow-lg">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                دخول تجريبي فوري
+              </button>
+            </form>
+          </div>
+
+          {/* Teacher cards preview */}
+          <div className="px-6 py-5">
+            <p className="text-[#93c5fd] text-xs font-semibold mb-4 text-right flex items-center gap-2">
+              <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#38bdf8] animate-pulse" />
+              معلمون مسجّلون في النظام التجريبي
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {DEMO_TEACHERS.map(t => <TeacherPreviewCard key={t.name} t={t} />)}
+            </div>
+            <p className="text-center text-[#475569] text-[10px] mt-4">
+              اضغط "دخول تجريبي فوري" لاستعراض التقييمات الكاملة، التوصيات، والتحليلات
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Login form */}
