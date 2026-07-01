@@ -2,42 +2,56 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { formatDateAr } from "@/lib/formatDate";
+import { cookies } from "next/headers";
+
+const DEMO_TEACHERS = [
+  { id: "d1", name: "أحمد محمد السالم",    subject: "الرياضيات",    grade_level: "الصف العاشر" },
+  { id: "d2", name: "فاطمة علي الزهراني",  subject: "العلوم",        grade_level: "الصف الثامن" },
+  { id: "d3", name: "خالد عبدالله العمري", subject: "اللغة العربية", grade_level: "الصف الثاني عشر" },
+  { id: "d4", name: "نورة سعد القحطاني",   subject: "التربية الإسلامية", grade_level: "الصف السادس" },
+];
+
+const DEMO_EVALUATIONS = [
+  { id: "e1", teacher_id: "d1", status: "completed", date: "2026-06-15", average_score: 4.6, lesson_topic: "المعادلات التربيعية" },
+  { id: "e2", teacher_id: "d1", status: "completed", date: "2026-05-20", average_score: 4.3, lesson_topic: "الدوال والعلاقات" },
+  { id: "e3", teacher_id: "d2", status: "draft",     date: "2026-06-22", average_score: null, lesson_topic: "الخلية وأجزاؤها" },
+  { id: "e4", teacher_id: "d3", status: "completed", date: "2026-06-10", average_score: 3.8, lesson_topic: "أساليب النداء والاستفهام" },
+  { id: "e5", teacher_id: "d4", status: "completed", date: "2026-06-18", average_score: 4.9, lesson_topic: "أركان الإسلام" },
+  { id: "e6", teacher_id: "d4", status: "completed", date: "2026-05-10", average_score: 4.7, lesson_topic: "السيرة النبوية" },
+];
 
 export default async function DashboardPage() {
   let teachers: any[] = [];
   let allEvaluations: any[] = [];
   let thisMonthEvals: any[] = [];
 
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) redirect("/login");
+  const cookieStore = await cookies();
+  const isDemo = cookieStore.get("x-demo-session")?.value === "1";
 
-    const now = new Date();
-    const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+  if (isDemo) {
+    teachers = DEMO_TEACHERS;
+    allEvaluations = DEMO_EVALUATIONS;
+    thisMonthEvals = DEMO_EVALUATIONS.filter(e => e.date.startsWith("2026-06"));
+  } else {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) redirect("/login");
 
-    const [t, e, m] = await Promise.all([
-      supabase.from("teachers").select("id, name, subject, grade_level").eq("user_id", user.id).order("created_at", { ascending: false }),
-      supabase.from("evaluations").select("id, teacher_id, status, date, average_score, lesson_topic").eq("user_id", user.id).order("date", { ascending: false }),
-      supabase.from("evaluations").select("id").eq("user_id", user.id).gte("date", firstOfMonth),
-    ]);
-    teachers = t.data ?? [];
-    allEvaluations = e.data ?? [];
-    thisMonthEvals = m.data ?? [];
-  } catch {
-    // Demo data for preview without Supabase
-    teachers = [
-      { id: "1", name: "أحمد محمد السالم",    subject: "الرياضيات",    grade_level: "الصف العاشر",      photo: "/teachers/teacher-1.svg" },
-      { id: "2", name: "فاطمة علي الزهراني",  subject: "العلوم",        grade_level: "الصف الثامن",      photo: "/teachers/teacher-2.svg" },
-      { id: "3", name: "خالد عبدالله العمري", subject: "اللغة العربية", grade_level: "الصف الثاني عشر", photo: "/teachers/teacher-3.svg" },
-    ];
-    allEvaluations = [
-      { id: "e1", teacher_id: "1", status: "completed", date: "2026-06-15", average_score: 4.6, lesson_topic: "المعادلات التربيعية" },
-      { id: "e2", teacher_id: "1", status: "completed", date: "2026-05-20", average_score: 4.3, lesson_topic: "الدوال والعلاقات" },
-      { id: "e3", teacher_id: "2", status: "draft",     date: "2026-06-22", average_score: null, lesson_topic: "الخلية وأجزاؤها" },
-      { id: "e4", teacher_id: "3", status: "completed", date: "2026-06-10", average_score: 3.8, lesson_topic: "أساليب النداء والاستفهام" },
-    ];
-    thisMonthEvals = allEvaluations.filter(e => e.date.startsWith("2026-06"));
+      const now = new Date();
+      const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split("T")[0];
+
+      const [t, e, m] = await Promise.all([
+        supabase.from("teachers").select("id, name, subject, grade_level").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("evaluations").select("id, teacher_id, status, date, average_score, lesson_topic").eq("user_id", user.id).order("date", { ascending: false }),
+        supabase.from("evaluations").select("id").eq("user_id", user.id).gte("date", firstOfMonth),
+      ]);
+      teachers = t.data ?? [];
+      allEvaluations = e.data ?? [];
+      thisMonthEvals = m.data ?? [];
+    } catch {
+      redirect("/login");
+    }
   }
 
   const totalTeachers = teachers?.length ?? 0;
