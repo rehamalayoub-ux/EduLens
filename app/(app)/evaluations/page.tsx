@@ -1,35 +1,40 @@
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { DEMO_EVALUATIONS, DEMO_TEACHERS } from "@/lib/demo-data";
 
 export default async function EvaluationsPage() {
+  const cookieStore = await cookies();
+  const isDemo = cookieStore.get("x-demo-session")?.value === "1";
+
   let evaluations: any[] = [];
-  try {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) redirect("/login");
-    const { data } = await supabase
-      .from("evaluations")
-      .select("*, teacher:teachers(id, name, subject)")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    evaluations = data ?? [];
-  } catch {
-    evaluations = [
-      { id: "e1", teacher_id: "1", date: "2026-06-15", status: "completed", average_score: 4.6, teacher: { id: "1", name: "أحمد محمد السالم",    subject: "الرياضيات"    } },
-      { id: "e2", teacher_id: "2", date: "2026-06-22", status: "draft",     average_score: null, teacher: { id: "2", name: "فاطمة علي الزهراني",  subject: "العلوم"       } },
-      { id: "e3", teacher_id: "3", date: "2026-06-10", status: "completed", average_score: 3.8, teacher: { id: "3", name: "خالد عبدالله العمري", subject: "اللغة العربية" } },
-      { id: "e4", teacher_id: "4", date: "2026-05-28", status: "completed", average_score: 4.2, teacher: { id: "4", name: "نورة سعد القحطاني",   subject: "الفيزياء"     } },
-      { id: "e5", teacher_id: "1", date: "2026-05-20", status: "completed", average_score: 4.3, teacher: { id: "1", name: "أحمد محمد السالم",    subject: "الرياضيات"    } },
-      { id: "e6", teacher_id: "5", date: "2026-05-12", status: "completed", average_score: 3.5, teacher: { id: "5", name: "محمد إبراهيم الشمري", subject: "التاريخ"      } },
-    ];
+
+  if (isDemo) {
+    evaluations = DEMO_EVALUATIONS.map(e => {
+      const teacher = DEMO_TEACHERS.find(t => t.id === e.teacher_id);
+      return { ...e, teacher: teacher ? { id: teacher.id, name: teacher.name, subject: teacher.subject } : null };
+    });
+  } else {
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) redirect("/login");
+      const { data } = await supabase
+        .from("evaluations")
+        .select("*, teacher:teachers(id, name, subject)")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      evaluations = data ?? [];
+    } catch {
+      redirect("/login");
+    }
   }
 
-  // Group by teacher to compute visit counts
   const visitsByTeacher: Record<string, number> = {};
   for (const ev of evaluations) {
-    const tid = ev.teacher_id ?? ev.teacher?.id ?? ev.id;
-    visitsByTeacher[tid] = (visitsByTeacher[tid] ?? 0) + 1;
+    const tid = ev.teacher_id ?? ev.teacher?.id;
+    if (tid) visitsByTeacher[tid] = (visitsByTeacher[tid] ?? 0) + 1;
   }
   const totalVisits = evaluations.length;
 
@@ -41,21 +46,27 @@ export default async function EvaluationsPage() {
     return             { label: "يحتاج تطوير", color: "#ba1a1a", bg: "#fee2e2" };
   }
 
+  function formatDate(d: string) {
+    try { return new Date(d).toLocaleDateString("ar-SA", { year: "numeric", month: "long", day: "numeric" }); }
+    catch { return d; }
+  }
+
   return (
     <div dir="rtl">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-[#091426]">سجل التقييمات</h1>
           <p className="text-sm text-[#75777d] mt-0.5">إجمالي الزيارات: <span className="font-bold text-[#091426]">{totalVisits}</span></p>
         </div>
-        <Link href="/evaluations/new" className="flex items-center gap-2 bg-[#00a64a] hover:bg-[#009040] text-white font-semibold px-5 py-3 rounded-xl transition text-sm">
-          <PlusIcon />
-          <span>تقييم جديد</span>
-        </Link>
+        {!isDemo && (
+          <Link href="/evaluations/new" className="flex items-center gap-2 bg-[#00a64a] hover:bg-[#009040] text-white font-semibold px-5 py-3 rounded-xl transition text-sm">
+            <PlusIcon />
+            <span>تقييم جديد</span>
+          </Link>
+        )}
       </div>
 
-      {!evaluations || evaluations.length === 0 ? (
+      {evaluations.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#e0e3e5] py-20 text-center shadow-sm">
           <div className="text-5xl mb-4">📋</div>
           <p className="text-[#45474c] font-medium mb-1">لا توجد تقييمات بعد</p>
@@ -70,33 +81,46 @@ export default async function EvaluationsPage() {
             <thead className="bg-[#f7f9fb] border-b border-[#e0e3e5]">
               <tr>
                 <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">اسم المعلم</th>
-                <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">عدد الزيارات الصفية</th>
+                <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">موضوع الدرس</th>
+                <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">التاريخ</th>
                 <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">مستوى المعلم</th>
+                <th className="px-5 py-3 text-xs font-semibold text-[#45474c] text-right">التقرير</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e0e3e5]">
-              {(evaluations as any[]).map((ev) => {
-                const tid = ev.teacher_id ?? ev.teacher?.id ?? ev.id;
-                const visits = visitsByTeacher[tid] ?? 1;
+              {evaluations.map((ev) => {
+                const tid = ev.teacher_id ?? ev.teacher?.id;
                 const lvl = levelLabel(ev.average_score);
                 return (
-                  <tr key={ev.id} className="hover:bg-[#f7f9fb] transition cursor-pointer">
+                  <tr key={ev.id} className="hover:bg-[#f7f9fb] transition">
                     <td className="px-5 py-4">
                       <Link href={`/teachers/${tid}`} className="block group">
-                        <p className="font-semibold text-[#091426] text-sm group-hover:text-[#00a64a] transition">{ev.teacher?.name}</p>
-                        <p className="text-xs text-[#75777d] mt-0.5">{ev.teacher?.subject}</p>
+                        <p className="font-semibold text-[#091426] text-sm group-hover:text-[#00a64a] transition">{ev.teacher?.name ?? "—"}</p>
+                        <p className="text-xs text-[#75777d] mt-0.5">{ev.teacher?.subject ?? ""}</p>
                       </Link>
                     </td>
                     <td className="px-5 py-4">
-                      <span className="text-sm font-bold text-[#091426]">{visits}</span>
+                      <p className="text-sm text-[#191c1e]">{ev.lesson_topic ?? "—"}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <span
-                        className="px-3 py-1 rounded-full text-xs font-semibold"
-                        style={{ color: lvl.color, background: lvl.bg }}
-                      >
+                      <p className="text-sm text-[#45474c] whitespace-nowrap">{ev.date ? formatDate(ev.date) : "—"}</p>
+                      <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full ${ev.status === "completed" ? "bg-[#dcfce7] text-[#00a64a]" : "bg-[#fff3cd] text-[#92600a]"}`}>
+                        {ev.status === "completed" ? "مكتمل" : "مسودة"}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold" style={{ color: lvl.color, background: lvl.bg }}>
                         {lvl.label}
                       </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <Link href={`/evaluations/${ev.id}`}
+                        className="w-8 h-8 rounded-lg bg-[#f2f4f6] hover:bg-[#091426] hover:text-white text-[#45474c] flex items-center justify-center transition"
+                        title="عرض التقرير">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                      </Link>
                     </td>
                   </tr>
                 );
