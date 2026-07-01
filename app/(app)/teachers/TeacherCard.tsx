@@ -8,9 +8,19 @@ type Teacher = {
   visits: number; avg_score: number | null; status: string; photo?: string;
 };
 
+const AVATAR_COLORS = ["#7c3aed","#0891b2","#be185d","#059669","#d97706","#dc2626","#2563eb","#0d9488"];
+
+function pickColor(name: string) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffffffff;
+  return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+}
+
 export default function TeacherCard({ teacher: t }: { teacher: Teacher }) {
   const [photo, setPhoto] = useState<string | null>(t.photo ?? null);
+  const [photoError, setPhotoError] = useState(false);
   const initials = t.name.split(" ").slice(0, 2).map((w) => w[0]).join("");
+  const avatarColor = pickColor(t.name);
 
   function handlePhoto(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -30,11 +40,13 @@ export default function TeacherCard({ teacher: t }: { teacher: Teacher }) {
       {/* Avatar + upload */}
       <div className="bg-[#f7f9fb] px-5 pt-6 pb-5 flex flex-col items-center text-center">
         <label className="relative cursor-pointer group mb-3">
-          <div className="w-20 h-20 rounded-full border-2 border-dashed border-[#c5c6cd] group-hover:border-[#091426] transition flex items-center justify-center overflow-hidden bg-white shadow">
-            {photo ? (
-              <img src={photo} alt={t.name} className="w-full h-full object-cover rounded-full" />
+          <div className="w-20 h-20 rounded-full border-2 border-dashed border-[#c5c6cd] group-hover:border-[#091426] transition flex items-center justify-center overflow-hidden shadow"
+            style={{ background: photo && !photoError ? "white" : avatarColor }}>
+            {photo && !photoError ? (
+              <img src={photo} alt={t.name} className="w-full h-full object-cover rounded-full"
+                onError={() => setPhotoError(true)} />
             ) : (
-              <span className="text-2xl font-bold text-[#45474c]">{initials}</span>
+              <span className="text-2xl font-bold text-white">{initials}</span>
             )}
           </div>
           <div className="absolute bottom-0 left-0 w-6 h-6 bg-[#091426] rounded-full flex items-center justify-center shadow opacity-0 group-hover:opacity-100 transition">
